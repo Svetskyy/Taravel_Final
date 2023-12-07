@@ -1,14 +1,20 @@
 const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
+const zlib = require("zlib");
 
 
 const db = mysql.createPool({
-  connectionLimit: 10, // Adjust the limit based on your needs
+  connectionLimit: 10,
   host: "154.41.240.230",
   user: "u532639681_root",
   password: "W@2915djkq#",
-  database: "u532639681_mydatabase"
+  database: "u532639681_mydatabase",
+  compress: true, // Enable compression
+  stream: function (options, callback) {
+    // Use zlib.createDeflateRaw() for raw deflate compression
+    return zlib.createGzip(options, callback);
+  },
 });
 
 // The pool will emit a connection event when a new connection is made
@@ -21,7 +27,7 @@ db.on('error', (err) => {
   console.error('Error in MySQL connection pool:', err);
 });
 const app = express();
-app.use(bodyParser.json({ limit: "200mb" }));
+app.use(bodyParser.json({ limit: "50mb" }));
 
 // Serve static files from the root directory
 app.use(express.static("./"));
