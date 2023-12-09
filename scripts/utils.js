@@ -269,7 +269,7 @@ function routeTemplate1() {
   sourceCoordinates = {
     lat: 14.3250603,
     lng: 120.9453688,
-  };
+  }; 
   destCoordinates = {
     lat: 14.3165996,
     lng: 120.9853831,

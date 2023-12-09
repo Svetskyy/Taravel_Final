@@ -394,20 +394,22 @@ async function runGeneticAlgorithm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sourceCoordinates, destCoordinates }),
       });
+  
       const data = await response.json();
-
+  
       if (data.exists && data.algResults) {
-        console.log("directions exist");
+        console.log("Directions exist");
         algResults = data.algResults;
         console.log("algResults");
         console.log(algResults);
       } else {
-        console.log("directions doesn't exist");
+        console.log("Directions don't exist");
         algResults = await geneticAlgorithm();
         console.log("algResults");
         console.log(algResults);
+  
         // Save the new result to the database
-        await fetch("/api/save-result", {
+        const saveResponse = await fetch("/api/save-result", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -416,6 +418,9 @@ async function runGeneticAlgorithm() {
             algResults,
           }),
         });
+  
+        const saveData = await saveResponse.json();
+        console.log(saveData.message);
       }
 
       const routeTypes = [
@@ -496,9 +501,11 @@ async function runGeneticAlgorithm() {
     }
   }, 2000);
 }
-
 async function regenerateAlgo() {
   try {
+    // Show loading overlay
+    toggleLoading(true);
+
     // Check if directions exist in the database
     const checkResponse = await fetch("/api/check", {
       method: "POST",
@@ -522,8 +529,14 @@ async function regenerateAlgo() {
 
     // Call the genetic algorithm function
     await runGeneticAlgorithm();
+
+    // Hide loading overlay after the genetic algorithm is completed
+    toggleLoading(false);
   } catch (error) {
     console.error(error);
+    // Hide loading overlay in case of an error
+    toggleLoading(false);
+    // Handle error (e.g., display an error message)
   }
 }
 
